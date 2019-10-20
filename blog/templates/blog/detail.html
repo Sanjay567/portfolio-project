@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
   <meta name="generator" content="Jekyll v3.8.5">
-  <title>Sanjay Manohar</title>
+  <title>{{blog.title}}</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/album/">
 
@@ -52,37 +52,18 @@
   </header>
 
   <main role="main">
+    <div class="container">
 
-    <section class="jumbotron text-center">
-      <div class="container">
-        <h1 class="jumbotron-heading">Hi, I am Sanjay</h1>
-        <p class="lead text-muted">Hey I am Sanjay and This is my portfolio.</p>
-        <p>
-          <a href="mailto:sanjaybm567@gmail.com" class="btn btn-primary my-2">Mail me</a>
-        </p>
-        <img src="{% static 'me.jpg' %}" height="300"/>
-      </div>
-    </section>
+      <h1 class="text-center pt-3">{{blog.title}}</h1>
+      <p class="text-center">{{blog.pub_date}}</p>
+      <img class="img-fluid" src="{{ blog.image.url }}" />
 
-    <div class="album py-5 bg-light">
-      <div class="container">
 
-        <div class="row">
-          {% for job in jobs.all %}
-          <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-              <img class="bd-placeholder-img card-img-top" width="100%" height="225" preserveAspectRatio="xMidYMid slice" focusable="false" src="{{ job.image.url }}" />
-              <div class="card-body">
-                <p class="card-text">{{job.summary}}</p>
+      <br />
+      <br />
+      <p>{{ blog.body }}</p>
 
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
     </div>
-
   </main>
 
   <footer class="text-muted">

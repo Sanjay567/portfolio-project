@@ -1,0 +1,72 @@
+def setRange( self, args ):
+      cost = args.get( 'COST' )
+      prefix = Arnet.Prefix( args.get( 'PREFIX' ) )
+      if args.get( 'not-advertise' ):
+         restricted = True
+      else:
+         restricted = False
+      if cost is None:
+         metric = 0
+      else:
+         metric = cost
+      areaConfig = self._getOrCreateAreaConfig( args.get( 'AREA_ID' ) )
+      if not areaConfig:
+         return
+      areaConfig.networkList.addMember( Tac.Value(
+         "Routing::Ospf::Network", network=prefix, restricted=restricted,
+         cost=metric) )
+
+   def noRange( self, args ):
+      areaId = args.get( 'AREA_ID' )
+      advertise = args.get( 'advertise' )
+      cost = args.get( 'COST' )
+      prefix = Arnet.Prefix( args.get( 'PREFIX' ) )
+      areaConfig = self._getAreaConfig( areaId )
+      if not areaConfig:
+         return
+      network = areaConfig.networkList.get( prefix )
+      if not network:
+         return
+      if ( advertise is None or advertise=='advertise' ) and cost is None:
+         del areaConfig.networkList[ prefix ]
+         self._deleteAreaConfigIfAllAttributeHaveDefaults( areaId )
+         return
+
+      restricted = False
+      if advertise == 'not-advertise':
+         restricted = True
+      if cost == None:
+         cost = 0
+      if network.restricted == restricted and network.cost == cost:
+         cost = 0
+         if restricted:
+            restricted = False
+         areaConfig.networkList.addMember( Tac.Value(
+            "Routing::Ospf::Network", network=prefix, restricted=restricted,
+            cost=cost) )
+
+
+class OspfAreaRangeCmd( CliCommand.CliCommandClass ):
+   syntax = 'area AREA_ID range PREFIX [cost COST] [ advertise | not-advertise ]'
+   noOrDefaultSyntax = syntax
+   data = {
+          'area': areaKw,
+          'AREA_ID': AreaIdExpression,
+          'range': 'Configure route summarization',
+          'PREFIX': prefix,
+          'cost': costKw,
+          'COST': 'Range cost value',
+          'advertise': 'Enable Advertisement of the range',
+          'not-advertise': 'Disable Advertisement of the range',
+          }
+   handler = RouterOspfMode.setRange
+   noOrDefaultHandler = RouterOspfMode.noRange
+
+RouterOspfMode.addCommandClass( OspfAreaRangeCmd )
+
+
+prefix = IpAddr.IpAddrOrPrefix( 'IP address',
+                                'Subnet\'s mask value',
+                                'IP address with mask length', partial=True,
+                                overlap=
+                                IpAddr.PREFIX_OVERLAP_AUTOZERO )
